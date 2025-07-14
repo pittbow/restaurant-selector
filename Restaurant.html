@@ -1,0 +1,329 @@
+<!DOCTYPE html>
+<html lang="zh-TW" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>敬賀青雲路 - 逢甲師生餞別宴精選餐廳</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700&display=swap" rel="stylesheet">
+    <!-- Chosen Palette: Warm Taupe and Sage -->
+    <!-- Application Structure Plan: A single-page application with a sticky navigation bar that links to different sections. The structure prioritizes user decision-making by first offering a "Quick Recommendation" based on desired atmosphere (vibe), which filters the view. This is followed by a "Detailed Comparison" section with expandable cards for in-depth information, and finally a "Budget Chart Analysis" for quick visual financial comparison. This task-oriented flow (from vibe -> comparison -> detail) is more intuitive for a user making a choice than a linear report. -->
+    <!-- Visualization & Content Choices: 1. Report Info: Four main restaurant recommendations. Goal: Compare & Decide. Viz/Presentation: Interactive cards in a grid layout. Interaction: Clicking a "vibe" button scrolls to and highlights a card. Justification: Guides the user based on their primary decision factor (atmosphere) first. 2. Report Info: Estimated per-person cost. Goal: Compare against budget. Viz/Presentation: Chart.js Bar Chart. Interaction: Tooltips on hover show exact costs. Horizontal lines indicate the $600-$800 budget range. Justification: Provides an immediate, clear visual summary of financial viability. Library/Method: Chart.js/Canvas. -->
+    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+    <style>
+        body {
+            font-family: 'Noto Sans TC', sans-serif;
+        }
+        .chart-container {
+            position: relative;
+            width: 100%;
+            max-width: 800px;
+            margin-left: auto;
+            margin-right: auto;
+            height: 300px;
+            max-height: 400px;
+        }
+        @media (min-width: 768px) {
+            .chart-container {
+                height: 400px;
+            }
+        }
+        details > summary {
+            list-style: none;
+        }
+        details > summary::-webkit-details-marker {
+            display: none;
+        }
+        .highlight {
+            transition: all 0.3s ease-in-out;
+            transform: scale(1.02);
+            box-shadow: 0 0 25px rgba(212, 175, 55, 0.5);
+        }
+    </style>
+</head>
+<body class="bg-stone-50 text-stone-800">
+
+    <header class="bg-white/80 backdrop-blur-lg sticky top-0 z-50 shadow-sm">
+        <nav class="container mx-auto px-6 py-3 flex justify-between items-center">
+            <div class="text-xl font-bold text-amber-700">餞別宴餐廳選擇器</div>
+            <div class="hidden md:flex space-x-8">
+                <a href="#intro" class="text-stone-600 hover:text-amber-700 transition">報告簡介</a>
+                <a href="#quick-rec" class="text-stone-600 hover:text-amber-700 transition">快速推薦</a>
+                <a href="#details" class="text-stone-600 hover:text-amber-700 transition">詳細比較</a>
+                <a href="#chart" class="text-stone-600 hover:text-amber-700 transition">預算分析</a>
+            </div>
+        </nav>
+    </header>
+
+    <main class="container mx-auto px-6 py-8 md:py-12">
+
+        <section id="intro" class="mb-16 text-center">
+            <h1 class="text-4xl md:text-5xl font-bold text-amber-800 mb-4">敬賀青雲路</h1>
+            <p class="max-w-3xl mx-auto text-lg text-stone-600">
+                為慶賀兩位高材生鵬程萬里，這份互動報告將協助您在四人、單人預算600-800元的條件下，快速找到最適合的餞別宴餐廳。我們將從氛圍、預算與特色切入，助您做出完美選擇。
+            </p>
+        </section>
+
+        <section id="quick-rec" class="mb-16">
+            <h2 class="text-3xl font-bold text-center mb-8 text-stone-800">第一步：您期望的用餐氛圍是？</h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                <button data-target="rec-yakiniku" class="quick-rec-btn group block text-left p-6 bg-white rounded-xl shadow-md hover:shadow-lg transition transform hover:-translate-y-1">
+                    <div class="text-3xl mb-2">🤝</div>
+                    <h3 class="text-xl font-bold text-stone-800 group-hover:text-amber-700 transition">互動與歡慶</h3>
+                    <p class="text-stone-500">追求活潑、互動、高CP值的慶祝，讓大家動手同樂。</p>
+                </button>
+                <button data-target="rec-hotpot" class="quick-rec-btn group block text-left p-6 bg-white rounded-xl shadow-md hover:shadow-lg transition transform hover:-translate-y-1">
+                    <div class="text-3xl mb-2">🏛️</div>
+                    <h3 class="text-xl font-bold text-stone-800 group-hover:text-amber-700 transition">莊重與雅致</h3>
+                    <p class="text-stone-500">營造一場莊重、令人難忘的體驗，展現對場合的重視。</p>
+                </button>
+                <button data-target="rec-thai" class="quick-rec-btn group block text-left p-6 bg-white rounded-xl shadow-md hover:shadow-lg transition transform hover:-translate-y-1">
+                    <div class="text-3xl mb-2">🍛</div>
+                    <h3 class="text-xl font-bold text-stone-800 group-hover:text-amber-700 transition">風味與共享</h3>
+                    <p class="text-stone-500">以最豐盛、慷慨的佳餚表達心意，來場味覺盛宴。</p>
+                </button>
+                 <button data-target="rec-italian" class="quick-rec-btn group block text-left p-6 bg-white rounded-xl shadow-md hover:shadow-lg transition transform hover:-translate-y-1">
+                    <div class="text-3xl mb-2">💬</div>
+                    <h3 class="text-xl font-bold text-stone-800 group-hover:text-amber-700 transition">經典與對話</h3>
+                    <p class="text-stone-500">期盼一場寧靜、以深度對話為核心的晚餐。</p>
+                </button>
+            </div>
+             <p class="text-center text-sm text-stone-500 mt-4">點擊上方按鈕，將會跳轉至下方對應的餐廳詳細介紹。</p>
+        </section>
+
+        <section id="details" class="mb-16 scroll-mt-24">
+            <h2 class="text-3xl font-bold text-center mb-8 text-stone-800">第二步：深入了解各家首選餐廳</h2>
+            <div id="restaurant-cards" class="space-y-8">
+                
+                <div id="rec-yakiniku" class="restaurant-card bg-white p-6 md:p-8 rounded-2xl shadow-lg border border-transparent">
+                    <div class="md:flex md:gap-8">
+                        <div class="md:w-1/3 mb-4 md:mb-0">
+                             <h3 class="text-2xl font-bold text-amber-800">Oh! my原燒</h3>
+                             <p class="text-lg font-semibold text-stone-600 mb-2">日式燒肉 | 互動歡慶</p>
+                             <div class="flex items-center gap-2 text-stone-500 mb-4">
+                                <span>🥩</span>
+                                <span>預估：NT$ 710 - 830 /人</span>
+                             </div>
+                             <p class="text-green-700 font-bold text-lg bg-green-100 p-3 rounded-lg">核心亮點：「可控的放縱」模式，完美兼顧師長預算與學生食量。</p>
+                        </div>
+                        <div class="md:w-2/3">
+                            <p class="text-stone-600 mb-4">身為王品集團的升級品牌，巧妙地將高品質肉品套餐與無限量供應的自助吧結合。氛圍活潑現代，對年輕學子極具吸引力，家樂福內的絕佳位置更解決了停車問題。此模式確保了師長宴客的品質與預算控制，同時讓學生能透過自助吧獲得完全的飽足感，是策略性的完美解答。</p>
+                            <details class="text-sm">
+                                <summary class="cursor-pointer text-amber-700 font-semibold hover:underline">點此展開/收合詳細分析 ▼</summary>
+                                <div class="mt-4 border-t pt-4 text-stone-600 space-y-3">
+                                    <p><b>氛圍與場合：</b>現代、活潑、帶設計感，空間寬敞。在歡快與質感之間取得平衡，既有節慶熱鬧，又不失宴客品質。</p>
+                                    <p><b>預算策略：</b>推薦「經典伊比利豬單人套餐」(NT$648)，含服務費後約 NT$713，完全在預算內。四人各點一份，主餐肉盤豐盛，更能無限享用沙拉、熟食、飲品吧，CP值極高。</p>
+                                </div>
+                            </details>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="rec-hotpot" class="restaurant-card bg-white p-6 md:p-8 rounded-2xl shadow-lg border border-transparent">
+                     <div class="md:flex md:gap-8">
+                        <div class="md:w-1/3 mb-4 md:mb-0">
+                             <h3 class="text-2xl font-bold text-amber-800">昭日堂鍋煮</h3>
+                             <p class="text-lg font-semibold text-stone-600 mb-2">質感火鍋 | 典雅莊重</p>
+                             <div class="flex items-center gap-2 text-stone-500 mb-4">
+                                <span>🍲</span>
+                                <span>預估：NT$ 750 - 880 /人</span>
+                             </div>
+                             <p class="text-blue-700 font-bold text-lg bg-blue-100 p-3 rounded-lg">核心亮點：獲德國紅點設計大獎的禪風氛圍，展現師長為此場合的極致用心。</p>
+                        </div>
+                        <div class="md:w-2/3">
+                            <p class="text-stone-600 mb-4">坐落於南屯區的地標型餐廳，以其清水模建築聞名。室內日式禪風營造出大器、優雅靜謐的氛圍，極度適合師長宴客。選擇這裡，本身就傳遞了一個強烈的訊息：「我為這個重要的場合，精心挑選了一個特別的地方。」這將一場餐會，昇華為兼具美學與文化的活動。</p>
+                             <details class="text-sm">
+                                <summary class="cursor-pointer text-amber-700 font-semibold hover:underline">點此展開/收合詳細分析 ▼</summary>
+                                <div class="mt-4 border-t pt-4 text-stone-600 space-y-3">
+                                    <p><b>氛圍與場合：</b>莊重得體，能讓人靜心進行有意義的對話。半獨立座位區與包廂提升了特殊場合的適用性。</p>
+                                    <p><b>預算策略：</b>採「套餐＋自助吧」模式。預算稍具挑戰性但可實現。可考慮點購兩套高品質雙人套餐，或四份中高價位的個人套餐，將總預算控制在3,200元以內。例如選擇伊比利豬肉四人套餐，人均約812.5元。</p>
+                                </div>
+                            </details>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="rec-thai" class="restaurant-card bg-white p-6 md:p-8 rounded-2xl shadow-lg border border-transparent">
+                     <div class="md:flex md:gap-8">
+                        <div class="md:w-1/3 mb-4 md:mb-0">
+                             <h3 class="text-2xl font-bold text-amber-800">曼谷皇朝泰式料理</h3>
+                             <p class="text-lg font-semibold text-stone-600 mb-2">道地泰菜 | 豐盛共享</p>
+                             <div class="flex items-center gap-2 text-stone-500 mb-4">
+                                <span>🍛</span>
+                                <span>預估：NT$ 500 - 700 /人</span>
+                             </div>
+                             <p class="text-orange-700 font-bold text-lg bg-orange-100 p-3 rounded-lg">核心亮點：無可比擬的超高CP值，能用同樣預算點上滿桌菜，最大化地展現師長的慷慨。</p>
+                        </div>
+                        <div class="md:w-2/3">
+                            <p class="text-stone-600 mb-4">以道地美味與實惠價格建立起極高聲譽，Google擁有4.9星超高分。氛圍親切溫馨，適合專注美食與同伴的輕鬆聚會。不收服務費、合菜折扣、慷慨份量等特點，意味著師長的預算能發揮最大效益，創造一場視覺與味覺的盛宴，是展現大方最有效的方式。</p>
+                             <details class="text-sm">
+                                <summary class="cursor-pointer text-amber-700 font-semibold hover:underline">點此展開/收合詳細分析 ▼</summary>
+                                <div class="mt-4 border-t pt-4 text-stone-600 space-y-3">
+                                    <p><b>氛圍與場合：</b>乾淨舒適，氛圍親切不造作。提供獨立包廂，適合團體用餐，營造家庭式聚會感。</p>
+                                    <p><b>預算策略：</b>極易控制。不收服務費，合菜享折扣。多數主菜價格落在190-350元，香米飯無限享用。四人點上5-6道菜，總花費可能不到 NT$1,500，預算綽綽有餘。</p>
+                                </div>
+                            </details>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="rec-italian" class="restaurant-card bg-white p-6 md:p-8 rounded-2xl shadow-lg border border-transparent">
+                     <div class="md:flex md:gap-8">
+                        <div class="md:w-1/3 mb-4 md:mb-0">
+                             <h3 class="text-2xl font-bold text-amber-800">卡索里拉 Casolira</h3>
+                             <p class="text-lg font-semibold text-stone-600 mb-2">當代義式 | 專注對話</p>
+                             <div class="flex items-center gap-2 text-stone-500 mb-4">
+                                <span>💬</span>
+                                <span>預估：NT$ 660 - 770 /人</span>
+                             </div>
+                             <p class="text-purple-700 font-bold text-lg bg-purple-100 p-3 rounded-lg">核心亮點：最適合深度交談的用餐環境，讓師長的臨別贈言更顯珍貴。</p>
+                        </div>
+                        <div class="md:w-2/3">
+                            <p class="text-stone-600 mb-4">位於南屯區，以用心設計與優良餐點品質脫穎而出。典雅中帶點休閒氣息，挑高空間讓人感覺寬敞舒適。其餐點直接上桌的模式，最大限度地減少了用餐干擾，為不間斷、高質量的對話創造了最佳機會，是師生進行深度交流的絕佳場所。</p>
+                             <details class="text-sm">
+                                <summary class="cursor-pointer text-amber-700 font-semibold hover:underline">點此展開/收合詳細分析 ▼</summary>
+                                <div class="mt-4 border-t pt-4 text-stone-600 space-y-3">
+                                    <p><b>氛圍與場合：</b>輕鬆卻不失精緻。提供長桌與半開放式包廂，有利於團體對話。附設專屬停車場。</p>
+                                    <p><b>預算策略：</b>非常容易管理。推薦選擇 NT$599 或 NT$699 的排餐套餐，已包含前菜與飲品，計入服務費後仍在預算內。能讓師長大方地為每人招待一整套完整的西式餐點。</p>
+                                </div>
+                            </details>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </section>
+
+        <section id="chart" class="scroll-mt-24">
+            <h2 class="text-3xl font-bold text-center mb-8 text-stone-800">第三步：檢視預算視覺化分析</h2>
+            <p class="text-center text-stone-600 max-w-2xl mx-auto mb-6">此圖表比較了四家首選餐廳的預估人均花費（含服務費），並標示出您設定的 NT$600 至 NT$800 預算區間，讓您對各選項的財務可行性一目了然。</p>
+            <div class="bg-white p-4 sm:p-6 rounded-2xl shadow-lg">
+                <div class="chart-container">
+                    <canvas id="budgetChart"></canvas>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <footer class="bg-stone-100 mt-16">
+        <div class="container mx-auto px-6 py-4 text-center text-stone-500 text-sm">
+            <p>&copy; 2025 逢甲大學師生餞別宴餐廳推薦報告・互動版</p>
+        </div>
+    </footer>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const restaurantData = [
+                { name: 'Oh! my原燒', avgCost: (710 + 830) / 2, color: 'rgba(217, 119, 6, 0.7)' },
+                { name: '昭日堂鍋煮', avgCost: (750 + 880) / 2, color: 'rgba(59, 130, 246, 0.7)' },
+                { name: '曼谷皇朝泰式料理', avgCost: (500 + 700) / 2, color: 'rgba(234, 88, 12, 0.7)' },
+                { name: '卡索里拉 Casolira', avgCost: (660 + 770) / 2, color: 'rgba(126, 34, 206, 0.7)' }
+            ];
+
+            const ctx = document.getElementById('budgetChart').getContext('2d');
+            new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: restaurantData.map(r => r.name),
+                    datasets: [
+                        {
+                            label: '預估人均花費 (NT$)',
+                            data: restaurantData.map(r => r.avgCost),
+                            backgroundColor: restaurantData.map(r => r.color),
+                            borderColor: restaurantData.map(r => r.color.replace('0.7', '1')),
+                            borderWidth: 1
+                        },
+                        {
+                            label: '預算下限',
+                            data: Array(restaurantData.length).fill(600),
+                            type: 'line',
+                            borderColor: 'rgba(22, 163, 74, 1)',
+                            borderWidth: 2,
+                            pointRadius: 0,
+                            fill: false,
+                             borderDash: [5, 5],
+                        },
+                        {
+                            label: '預算上限',
+                            data: Array(restaurantData.length).fill(800),
+                            type: 'line',
+                            borderColor: 'rgba(220, 38, 38, 1)',
+                            borderWidth: 2,
+                            pointRadius: 0,
+                            fill: false,
+                            borderDash: [5, 5],
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: {
+                            beginAtZero: false,
+                            min: 400,
+                            ticks: {
+                                callback: function(value) {
+                                    return 'NT$ ' + value;
+                                }
+                            }
+                        }
+                    },
+                    plugins: {
+                        legend: {
+                            position: 'top',
+                        },
+                        title: {
+                            display: true,
+                            text: '首選餐廳預估人均消費比較圖',
+                            font: {
+                                size: 18
+                            }
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    let label = context.dataset.label || '';
+                                    if (label) {
+                                        label += ': ';
+                                    }
+                                    if (context.parsed.y !== null) {
+                                        label += new Intl.NumberFormat('zh-TW', { style: 'currency', currency: 'TWD', minimumFractionDigits: 0 }).format(context.parsed.y);
+                                    }
+                                    return label;
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+
+            const quickRecBtns = document.querySelectorAll('.quick-rec-btn');
+            const restaurantCards = document.querySelectorAll('.restaurant-card');
+
+            quickRecBtns.forEach(btn => {
+                btn.addEventListener('click', () => {
+                    const targetId = btn.getAttribute('data-target');
+                    const targetElement = document.getElementById(targetId);
+                    
+                    if (targetElement) {
+                        restaurantCards.forEach(card => card.classList.remove('highlight', 'border-amber-400'));
+                        
+                        targetElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                        targetElement.classList.add('highlight', 'border-amber-400');
+                        
+                        setTimeout(() => {
+                            targetElement.classList.remove('highlight', 'border-amber-400');
+                        }, 2500);
+                    }
+                });
+            });
+        });
+    </script>
+
+</body>
+</html>
